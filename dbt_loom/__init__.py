@@ -22,7 +22,7 @@ except ModuleNotFoundError:
 
 from dbt_loom.config import dbtLoomConfig
 from dbt_loom.logging import fire_event
-from dbt_loom.manifests import ManifestLoader, ManifestNode
+from dbt_loom.manifests import ManifestLoader, ManifestNode, ManifestNodeExtended
 
 import importlib.metadata
 
@@ -54,7 +54,7 @@ class LoomModelNodeArgs(ModelNodeArgs):
         return unique_id
 
 
-def identify_node_subgraph(manifest) -> Dict[str, ManifestNode]:
+def identify_node_subgraph(manifest, include_node_documentation) -> Dict[str, ManifestNode]:
     """
     Identify all nodes that should be selected from the manifest, and return ManifestNodes.
     """
@@ -79,7 +79,10 @@ def identify_node_subgraph(manifest) -> Dict[str, ManifestNode]:
             if node.get(key):
                 node[key] = str(node[key])
 
-        output[unique_id] = ManifestNode(**(node))
+        if include_node_documentation:
+            output[unique_id] = ManifestNodeExtended(**(node))
+        else:
+            output[unique_id] = ManifestNode(**(node))
 
     return output
 
@@ -282,7 +285,7 @@ class dbtLoom(dbtPlugin):
             )
             self.manifests[manifest_name] = manifest
 
-            selected_nodes = identify_node_subgraph(manifest)
+            selected_nodes = identify_node_subgraph(manifest, manifest_reference.include_node_documentation)
 
             # Remove nodes from excluded packages.
             filtered_nodes = {

@@ -37,6 +37,14 @@ class DependsOn(BaseModel):
     nodes: List[str] = Field(default_factory=list)
     macros: List[str] = Field(default_factory=list)
 
+class ColumnInfo(BaseModel):
+    """A basic ColumnInfo, used mostly to keep documentation and metadata when injected into the manifest"""
+
+    name: str
+    description: Optional[str] = None
+    meta: Optional[Dict] = None
+    data_type: Optional[str] = None
+    tags: Optional[List[str]] = None
 
 class ManifestNode(BaseModel, use_enum_values=True):
     """A basic ManifestNode that can be referenced across projects."""
@@ -91,6 +99,13 @@ class ManifestNode(BaseModel, use_enum_values=True):
             return self.model_dump(exclude=exclude_set)  # type: ignore
 
         return self.dict(exclude=exclude_set)
+
+
+class ManifestNodeExtended(ManifestNode):
+    """An extended ManifestNode that includes description and columns information."""
+
+    description: Optional[str] = None
+    columns: Optional[Dict[str, ColumnInfo]] = None
 
 
 class UnknownManifestPathType(Exception):
@@ -239,7 +254,7 @@ class ManifestLoader:
             command_index=config.command_index,
         )
         return paradime_client.load_manifest()
-    
+
     @staticmethod
     def load_from_databricks(config: DatabricksReferenceConfig) -> Dict:
         """Load a manifest dictionary from Databricks."""
