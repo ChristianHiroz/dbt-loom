@@ -33,17 +33,21 @@ class LoomModelNodeArgs(ModelNodeArgs):
 
     resource_type: NodeType = NodeType.Model
     group: Optional[str] = None
+    description: Optional[str] = None
+    columns: Optional[Dict[str, ColumnInfo]] = None
 
     def __init__(self, **kwargs):
         super().__init__(
             **{
                 key: value
                 for key, value in kwargs.items()
-                if key not in ("resource_type", "group")
+                if key not in ("resource_type", "group", "description", "columns")
             }
         )
         self.resource_type = kwargs.get("resource_type", NodeType.Model)
         self.group = kwargs.get("group")
+        self.description = kwargs.get("description")
+        self.columns = kwargs.get("columns")
 
     @property
     def unique_id(self) -> str:
