@@ -80,7 +80,6 @@ def identify_node_subgraph(manifest, include_node_documentation) -> Dict[str, Ma
                 node[key] = str(node[key])
 
         print(node)
-        quit()
         if include_node_documentation:
             output[unique_id] = ManifestNodeExtended(**(node))
         else:
